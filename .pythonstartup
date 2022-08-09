@@ -1,0 +1,57 @@
+## @brief Script to load module automaticaly in interactive console
+#  @details
+#  @author V. Caries (creator)
+#  @date August 9th 2022 (creation)
+
+# Constants
+MODULES = {'os': 'os',
+           'sys': 'sys',
+           'numpy': 'np',
+           'scipy': 'sp',
+           'pandas': 'pd'} # module to load {'module_name': 'module_shorcut'}
+
+
+## @brief function to print title
+#  @details
+#  @author V. Caries (creator)
+#  @date August 9th 2022 (creation)
+#  @param title [string] title to print
+#  @param suffix [string] suffix to print
+def print_title(title, suffix=''):
+    lent = len(title)
+    print('=' * lent)
+    print(title)
+    print('=' * lent + suffix)
+
+
+## @brief function to try to import modules
+#  @details use constants defined above
+#  @author V. Caries (creator)
+#  @date August 9th 2022 (creation)
+def try_importModule():
+    print_title('Importing additionnal packages')
+
+    # try to load importlib to be able to load MODULES
+    try:
+        import importlib
+
+    except ImportError:
+        print('importlib package is not available')
+
+    for module, short in MODULES.items():
+        try:
+            # use globals() to turn string short to global variable
+            globals()[short] = importlib.import_module(module)
+            print(f'   * Loading {module} as {short}')
+
+        except ImportError:
+            print(f'    Warning, {module} package is not available !')
+
+    print_title('Additionnal packages Imported ', '\n')
+    del globals()['MODULES'] # delete global variable MODULES
+
+
+if __name__=='__main__':
+    # Import modules
+    try_importModule()
+
