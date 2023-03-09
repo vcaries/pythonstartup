@@ -2,7 +2,7 @@
 #  @details
 #  @author V. Caries (creator)
 #  @date @li August 9th 2022 (creation)
-#  @date @li August 29th 2022 (last modification)
+#  @date @li March 9th 2023 (last modification)
 
 # Constants
 MODULES = {'os': 'os',
@@ -11,6 +11,14 @@ MODULES = {'os': 'os',
            'scipy': 'sp',
            'pandas': 'pd'} # Module to load {'module_name': 'module_shorcut'}
 SPACING = '     ' # Space between and after title
+
+
+## @brief function clear prompt
+#  @details
+#  @author V. Caries (creator)
+#  @date March 9th 2023 (creation)
+def cl():
+    os.system('clear')
 
 
 ## @brief function to print title
