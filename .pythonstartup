@@ -1,67 +1,119 @@
-## @brief Script to load module automatically in interactive console
-#  @details
-#  @author V. Caries (creator)
-#  @date @li August 9th 2022 (creation)
-#  @date @li March 9th 2023 (last modification)
+"""
+Script Name: Package Importer and Installer for Python Startup Interpreter
 
-# Constants
-MODULES = {'os': 'os',
-           'sys': 'sys',
-           'numpy': 'np',
-           'scipy': 'sp',
-           'pandas': 'pd'} # Module to load {'module_name': 'module_shorcut'}
-SPACING = '     ' # Space between and after title
+Description:
+This script allows you to import Python packages specified in the PACKAGE_SHORTCUTS dictionary. If a package fails
+to import, it attempts to install it using pip. After importing or installing, you can use the imported packages
+with their corresponding shortcuts.
+
+The PACKAGE_SHORTCUTS dictionary defines the package names and their corresponding shortcuts. You can add or modify
+the package shortcuts as needed.
+
+Usage:
+1. Run python command in interactive mode.
+2. After successful import or installation, you can access the imported packages using the specified shortcuts.
+   For example, if 'numpy' is imported with the shortcut 'np', you can access it as 'np'.
+
+Note:
+1. Make sure you have the required permissions to install packages using pip.
+2. Avoid running this script with sudo privileges unless necessary, as it may modify your system-wide Python packages.
+
+"""
+
+# Import built-in modules
+import importlib
+import subprocess
+import sys
+import os
 
 
-## @brief function clear prompt
-#  @details
-#  @author V. Caries (creator)
-#  @date March 9th 2023 (creation)
+# Global constants
+PACKAGE_SHORTCUTS = {'os': 'os',
+                     'sys': 'sys',
+                     'numpy': 'np',
+                     'scipy': 'sp',
+                     'pandas': 'pd',
+                     'sympy': 'sym'}  # Modules to load {'module_name': 'module_shorcut'}
+GREEN = '\033[92m'      # ANSI escape code for green
+RED = '\033[91m'        # ANSI escape code for red
+YELLOW = '\033[93m'     # ANSI escape code for yellow
+RESET = '\033[0m'       # ANSI escape code to reset color
+INDENT = ' ' * 4        # Indentation for printing
+
+
 def cl():
+    """
+    Clear the console.
+    """
     os.system('clear')
 
 
-## @brief function to print title
-#  @details
-#  @author V. Caries (creator)
-#  @date August 9th 2022 (creation)
-#  @param title [string] title to print
-#  @param suffix [string] suffix to print
-#  @param space [string] space between and after title
-def print_title(title, suffix='', space=''):
-    lent = len(space + title + space)
-    print('=' * lent)
-    print(f'{space}{title}{space}')
-    print('=' * lent + suffix)
+def print_title(content):
+    """
+    Print the title of the console.
+
+    Parameters:
+        content (str): The content of the title.
+    """
+    separator = '=' * len(content)
+    print(f'{separator}\n{content}\n{separator}')
 
 
-## @brief function to try to import modules
-#  @details use constants defined above
-#  @author V. Caries (creator)
-#  @date August 9th 2022 (creation)
-def try_importModule():
-    print_title('Importing additionnal packages', space=SPACING)
+def import_package(shortcut, package_name):
+    """
+    Import a Python package and handle exceptions if import fails.
 
-    # Try to load importlib to be able to load MODULES
+    Parameters:
+        shortcut (str): The shortcut to use for the package.
+        package_name (str): The name or shortcut of the package to import.
+
+    Returns:
+        module or None: Returns the imported module if successful, None if import failed.
+    """
     try:
-        import importlib
+        # Attempt to import the package
+        globals()[shortcut] = importlib.import_module(package_name)
+        print(f'{INDENT}{GREEN}v Loading package {package_name} as {shortcut}{RESET}')
+        return globals()[shortcut]
 
     except ImportError:
-        print('Warning, importlib package is not available !')
-
-    for module, short in MODULES.items():
-        try:
-            # Use globals() to turn string short to global variable
-            globals()[short] = importlib.import_module(module)
-            print(f'   v Loading package {module} as {short}')
-
-        except ImportError:
-            print(f'   x Warning, {module} package is not available !')
-
-    print_title('Additionnal packages Imported', suffix= '\n', space=SPACING)
-    del globals()['MODULES'] # Delete global variable MODULES
+        print(f'{INDENT}{RED}x Failed to import {package_name} as {shortcut}{RESET}')
+        return None
 
 
-if __name__=='__main__':
-    # Import modules
-    try_importModule()
+def install_package(package_name):
+    """
+    Attempt to install a package using pip.
+
+    Parameters:
+        package_name (str): The name of the package to install.
+    """
+    python_version = f"python{sys.version_info.major}.{sys.version_info.minor}"
+    print(f"{INDENT}{YELLOW}Attempting to install {package_name} using pip...{RESET}")
+    try:
+        subprocess.check_call([python_version, "-m", "pip", "install", package_name, "-q"])
+        print(f"{INDENT}{YELLOW}...{package_name} has been installed successfully{RESET}")
+
+    except subprocess.CalledProcessError:
+        print(f"{INDENT}{RED}Failed to install {package_name}{RESET}")
+
+
+def main():
+    """
+    Main function that imports packages based on the PACKAGE_SHORTCUTS dictionary.
+    """
+    print_title('Importing Additionnal Packages')
+    for package_name, shortcut in PACKAGE_SHORTCUTS.items():
+        module = import_package(shortcut, package_name)
+        if module is None:
+            install_package(package_name)
+            # Retry importing the package after installation
+            import_package(shortcut, package_name)
+
+    print_title('Additional Packages Imported')
+
+
+if __name__ == "__main__":
+    main()
+    # Remove constants from global namespace
+    del GREEN, RED, YELLOW, RESET, INDENT, PACKAGE_SHORTCUTS
