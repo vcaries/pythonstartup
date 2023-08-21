@@ -48,7 +48,7 @@ def cl():
     os.system('clear')
 
 
-def print_title(content):
+def print_title(content: str) -> None:
     """
     Print the title of the console.
 
@@ -59,7 +59,7 @@ def print_title(content):
     print(f'{separator}\n{content}\n{separator}')
 
 
-def import_package(shortcut, package_name):
+def import_package(shortcut: str, package_name: str) -> object or None:
     """
     Import a Python package and handle exceptions if import fails.
 
@@ -81,28 +81,28 @@ def import_package(shortcut, package_name):
         return None
 
 
-def install_package(package_name):
+def install_package(package_name: str) -> None:
     """
     Attempt to install a package using pip.
 
     Parameters:
         package_name (str): The name of the package to install.
     """
-    python_version = f"python{sys.version_info.major}.{sys.version_info.minor}"
-    print(f"{INDENT}{YELLOW}Attempting to install {package_name} using pip...{RESET}")
+    python_version = f'python{sys.version_info.major}.{sys.version_info.minor}'
+    print(f'{INDENT}{YELLOW}Attempting to install {package_name} using pip...{RESET}')
     try:
-        subprocess.check_call([python_version, "-m", "pip", "install", package_name, "-q"])
-        print(f"{INDENT}{YELLOW}...{package_name} has been installed successfully{RESET}")
+        subprocess.check_call([python_version, '-m', 'pip', 'install', package_name, '-q'])
+        print(f'{INDENT}{YELLOW}...{package_name} has been installed successfully{RESET}')
 
     except subprocess.CalledProcessError:
-        print(f"{INDENT}{RED}Failed to install {package_name}{RESET}")
+        print(f'{INDENT}{RED}Failed to install {package_name}{RESET}')
 
 
 def main():
     """
     Main function that imports packages based on the PACKAGE_SHORTCUTS dictionary.
     """
-    print_title('Importing Additionnal Packages')
+    print_title('Importing Additional Packages')
     for package_name, shortcut in PACKAGE_SHORTCUTS.items():
         module = import_package(shortcut, package_name)
         if module is None:
@@ -113,7 +113,7 @@ def main():
     print_title('Additional Packages Imported')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
     # Remove constants from global namespace
     del GREEN, RED, YELLOW, RESET, INDENT, PACKAGE_SHORTCUTS
